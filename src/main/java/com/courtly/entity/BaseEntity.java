@@ -9,12 +9,13 @@ import jakarta.persistence.PrePersist;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @MappedSuperclass
-public class BaseEntity {
+public abstract class BaseEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,6 +23,9 @@ public class BaseEntity {
 
     @Column(name = "created")
     private LocalDateTime created;
+
+    @Column(name = "deleted")
+    private Boolean deleted = Boolean.FALSE;
 
     @PrePersist
     protected void onCreate(){

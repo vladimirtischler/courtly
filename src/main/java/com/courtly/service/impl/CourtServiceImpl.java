@@ -1,50 +1,68 @@
 package com.courtly.service.impl;
 
 import com.courtly.dao.CourtDao;
+import com.courtly.dao.SurfaceTypeDao;
 import com.courtly.entity.Court;
+import com.courtly.entity.SurfaceType;
 import com.courtly.service.CourtService;
-import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
-public class CourtServiceImpl implements CourtService {
+public class CourtServiceImpl extends AbstractService<Court, CourtDao> implements CourtService{
 
-    private final CourtDao courtDao;
+    private SurfaceTypeDao surfaceTypeDao;
 
-    public CourtServiceImpl(CourtDao courtDao) {
-        this.courtDao = courtDao;
-    }
-
-
-    @Override
-    @Transactional
-    public void save(Court court) {
-        courtDao.save(court);
+    public CourtServiceImpl(CourtDao courtDao, SurfaceTypeDao surfaceTypeDao) {
+        super(courtDao);
+        this.surfaceTypeDao = surfaceTypeDao;
     }
 
     @Override
-    public void update(Court court) {
-        courtDao.update(court);
-    }
-
-    @Override
-    public Court findById(Long id) {
-        return courtDao.findById(id);
-    }
-
-    @Override
-    public List<Court> findAll() {
-        return courtDao.findAll();
-    }
-
-    @Override
-    public void delete(Long id) {
-        Court court = courtDao.findById(id);
-        if (court == null){
-            return;
+    public void save(Court entity) {
+        if (entity.getSurfaceType() == null){
+            throw new IllegalArgumentException("Surface type is mandatory");
         }
-        courtDao.delete(court);
+        SurfaceType surfaceType = null;
+        String surfaceName = entity.getSurfaceType().getName();
+        Long surfaceId = entity.getSurfaceType().getId();
+        if (surfaceName != null){
+            surfaceType = surfaceTypeDao.findByName(surfaceName);
+        } else if (entity.getSurfaceType().getId() != null){
+            surfaceType = surfaceTypeDao.findById(surfaceId);
+        }
+
+        if (surfaceType == null) {
+            throw new IllegalArgumentException("Surface "+ surfaceName + " with id "+surfaceId+ " not found");
+        }
+
+        entity.setSurfaceType(surfaceType);
+        super.save(entity);
+    }
+
+    @Override
+    public void update(Court entity) {
+        if (entity.getSurfaceType() == null){
+            throw new IllegalArgumentException("Surface type is mandatory");
+        }
+        SurfaceType surfaceType = null;
+        String surfaceName = entity.getSurfaceType().getName();
+        Long surfaceId = entity.getSurfaceType().getId();
+        if (surfaceName != null){
+            surfaceType = surfaceTypeDao.findByName(surfaceName);
+        } else if (entity.getSurfaceType().getId() != null){
+            surfaceType = surfaceTypeDao.findById(surfaceId);
+        }
+
+        if (surfaceType == null) {
+            throw new IllegalArgumentException("Surface "+ surfaceName + " with id "+surfaceId+ " not found");
+        }
+
+        entity.setSurfaceType(surfaceType);
+        super.update(entity);
+    }
+
+    @Override
+    public void validate(Court entity) {
+
     }
 }

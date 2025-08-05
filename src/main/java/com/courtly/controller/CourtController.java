@@ -12,49 +12,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("api/courts")
-public class CourtController {
-
-    private final CourtService courtService;
+public class CourtController extends CommonController<Court, CourtService>{
 
     public CourtController(CourtService courtService) {
-        this.courtService = courtService;
-    }
-
-    @PostMapping()
-    public ResponseEntity<Object> saveCourt(@RequestBody Court court){
-        courtService.save(court);
-
-        return ResponseEntity.ok().build();
-    }
-
-    @PutMapping()
-    public ResponseEntity<Object> updateCourt(@RequestBody Court court){
-        courtService.update(court);
-
-        return ResponseEntity.ok().build();
-    }
-
-    @GetMapping("{id}")
-    public ResponseEntity<Object> getCourt(@PathVariable(name = "id") Long id){
-        Court court = courtService.findById(id);
-        if (court == null){
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(court);
-    }
-
-    @GetMapping()
-    public ResponseEntity<Object> getCourt(){
-        return ResponseEntity.ok(courtService.findAll());
-    }
-
-    @DeleteMapping("{id}")
-    public ResponseEntity<Object> deleteCourt(@PathVariable(name = "id") Long id){
-        courtService.delete(id);
-        return ResponseEntity.ok().build();
+        super(courtService);
     }
 }
