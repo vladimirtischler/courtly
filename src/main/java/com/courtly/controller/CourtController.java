@@ -1,5 +1,6 @@
 package com.courtly.controller;
 
+import com.courtly.dto.CourtDto;
 import com.courtly.entity.Court;
 import com.courtly.service.CourtService;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("api/courts")
-public class CourtController extends CommonController<Court, CourtService>{
+public class CourtController extends CommonController<Court, CourtDto, CourtService>{
 
     public CourtController(CourtService courtService) {
         super(courtService);

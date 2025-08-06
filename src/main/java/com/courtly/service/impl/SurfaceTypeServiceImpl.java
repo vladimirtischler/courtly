@@ -1,29 +1,31 @@
 package com.courtly.service.impl;
 
 import com.courtly.dao.SurfaceTypeDao;
+import com.courtly.dto.SurfaceTypeDto;
 import com.courtly.entity.Court;
 import com.courtly.entity.SurfaceType;
+import com.courtly.mapper.SurfaceTypeMapper;
 import com.courtly.service.SurfaceTypeService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 @Service
-public class SurfaceTypeServiceImpl extends AbstractService<SurfaceType, SurfaceTypeDao> implements SurfaceTypeService {
+public class SurfaceTypeServiceImpl extends AbstractService<SurfaceType, SurfaceTypeDao, SurfaceTypeDto, SurfaceTypeMapper> implements SurfaceTypeService {
 
     private final SurfaceTypeDao surfaceTypeDao;
 
-    public SurfaceTypeServiceImpl(SurfaceTypeDao surfaceTypeDao) {
-        super(surfaceTypeDao);
+    public SurfaceTypeServiceImpl(SurfaceTypeDao surfaceTypeDao, SurfaceTypeMapper surfaceTypeMapper) {
+        super(surfaceTypeDao, surfaceTypeMapper);
         this.surfaceTypeDao = surfaceTypeDao;
     }
 
     @Override
-    public void save(SurfaceType entity) {
-        SurfaceType surfaceType = surfaceTypeDao.findByName(entity.getName());
+    public void save(SurfaceTypeDto dto) {
+        SurfaceType surfaceType = surfaceTypeDao.findByName(dto.getName());
         if (surfaceType != null){
-            throw new IllegalArgumentException("Surface with name " + entity.getName() + " already exists");
+            throw new IllegalArgumentException("Surface with name " + dto.getName() + " already exists");
         }
-        super.save(entity);
+        super.save(dto);
     }
 
     @Override

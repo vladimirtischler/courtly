@@ -1,5 +1,6 @@
 package com.courtly.controller;
 
+import com.courtly.dto.ReservationDto;
 import com.courtly.entity.Reservation;
 import com.courtly.service.ReservationService;
 import lombok.Getter;
@@ -14,7 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("api/reservations")
-public class ReservationController extends CommonController<Reservation, ReservationService>{
+public class ReservationController extends CommonController<Reservation, ReservationDto, ReservationService>{
     private final ReservationService reservationService;
 
     public ReservationController(ReservationService service) {
