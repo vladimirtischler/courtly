@@ -11,6 +11,5 @@ public interface CommonMapper<E extends BaseEntity, D extends BaseDto> {
     E toEntity(D dto);
     D toDto(E entity);
     void update(E entity, D dto);
-    List<E> toEntities(List<D> dtos);
     List<D> toDtos(List<E> entities);
 }

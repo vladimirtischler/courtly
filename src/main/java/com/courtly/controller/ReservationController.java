@@ -1,5 +1,6 @@
 package com.courtly.controller;
 
+import com.courtly.dto.ApiResponse;
 import com.courtly.dto.ReservationDto;
 import com.courtly.entity.Reservation;
 import com.courtly.service.ReservationService;
@@ -24,19 +25,25 @@ public class ReservationController extends CommonController<Reservation, Reserva
     }
 
     @GetMapping("court/{courtId}")
-    public ResponseEntity<Object> findAllByCourtId(@PathVariable(name="courtId") Long courtId, @RequestParam(name=
+    public ResponseEntity<ApiResponse<List<ReservationDto>>> findAllByCourtId(@PathVariable(name="courtId") Long courtId, @RequestParam(name=
             "order", required = false) String order) {
+
+        ApiResponse<List<ReservationDto>> response = new ApiResponse<>();
         try {
-            return ResponseEntity.ok(reservationService.findByCourtId(courtId, !"DESC".equalsIgnoreCase(order)));
+            response.setData(reservationService.findByCourtId(courtId, !"DESC".equalsIgnoreCase(order)));
+            return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e){
-            return ResponseEntity.badRequest().body(e.getMessage());
+            response.setErrors(List.of(e.getMessage()));
+            return ResponseEntity.badRequest().body(response);
         }
     }
 
     @GetMapping("phone-number/{phoneNumber}")
-    public ResponseEntity<Object> findAllByPhoneNumber(@PathVariable(name="phoneNumber") String phoneNumber,
+    public ResponseEntity<ApiResponse<List<ReservationDto>>> findAllByPhoneNumber(@PathVariable(name="phoneNumber") String phoneNumber,
                                                       @RequestParam(name= "inFuture", required = false) Boolean inFuture) {
 
-        return ResponseEntity.ok(reservationService.findByPhoneNumber(phoneNumber, Boolean.TRUE.equals(inFuture)));
+        ApiResponse<List<ReservationDto>> response = new ApiResponse<>();
+        response.setData(reservationService.findByPhoneNumber(phoneNumber, Boolean.TRUE.equals(inFuture)));
+        return ResponseEntity.ok(response);
     }
 }

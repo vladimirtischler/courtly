@@ -26,21 +26,19 @@ public class CourtServiceImpl extends AbstractService<Court, CourtDao, CourtDto,
 
     @Override
     public void save(CourtDto dto) {
-        if (dto.getSurfaceType() == null){
-            throw new IllegalArgumentException("Surface type is mandatory");
-        }
         Court court = courtMapper.toEntity(dto);
         SurfaceType surfaceType = null;
         String surfaceName = dto.getSurfaceType().getName();
         Long surfaceId = dto.getSurfaceType().getId();
-        if (surfaceName != null){
-            surfaceType = surfaceTypeDao.findByName(surfaceName);
-        } else if (dto.getSurfaceType().getId() != null){
+        if (surfaceId != null){
             surfaceType = surfaceTypeDao.findById(surfaceId);
+        } else if (surfaceName != null){
+            surfaceType = surfaceTypeDao.findByName(surfaceName);
         }
 
         if (surfaceType == null) {
-            throw new IllegalArgumentException("Surface "+ surfaceName + " with id "+surfaceId+ " not found");
+            surfaceName = surfaceName == null ? "" : surfaceName;
+            throw new IllegalArgumentException("Surface " + surfaceName + " with id "+surfaceId+ " not found");
         }
 
         court.setSurfaceType(surfaceType);
@@ -49,21 +47,23 @@ public class CourtServiceImpl extends AbstractService<Court, CourtDao, CourtDto,
 
     @Override
     public void update(CourtDto dto, Long id) {
-        if (dto.getSurfaceType() == null){
-            throw new IllegalArgumentException("Surface type is mandatory");
-        }
         Court court = courtDao.findById(id);
+        if (court == null){
+            throw new IllegalArgumentException("Court with id "+id+" not " +
+                                                       "found");
+        }
         courtMapper.update(court, dto);
         SurfaceType surfaceType = null;
         String surfaceName = dto.getSurfaceType().getName();
         Long surfaceId = dto.getSurfaceType().getId();
-        if (surfaceName != null){
-            surfaceType = surfaceTypeDao.findByName(surfaceName);
-        } else if (surfaceId != null){
+        if (surfaceId != null){
             surfaceType = surfaceTypeDao.findById(surfaceId);
+        } else if (surfaceName != null){
+            surfaceType = surfaceTypeDao.findByName(surfaceName);
         }
 
         if (surfaceType == null) {
+            surfaceName = surfaceName == null ? "" : surfaceName;
             throw new IllegalArgumentException("Surface "+ surfaceName + " with id "+surfaceId+ " not found");
         }
 

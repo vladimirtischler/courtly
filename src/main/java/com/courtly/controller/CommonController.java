@@ -1,8 +1,10 @@
 package com.courtly.controller;
 
+import com.courtly.dto.ApiResponse;
 import com.courtly.dto.BaseDto;
 import com.courtly.entity.BaseEntity;
 import com.courtly.service.CommonService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,43 +24,51 @@ public abstract class CommonController<E extends BaseEntity, D extends BaseDto, 
     }
 
     @PostMapping
-    public ResponseEntity<Object> save(@RequestBody D dto){
+    public ResponseEntity<ApiResponse<D>> save(@RequestBody @Valid D dto){
+        ApiResponse<D> response = new ApiResponse<>();
         try {
             service.save(dto);
         } catch (IllegalArgumentException e){
-            return ResponseEntity.badRequest().body(e.getMessage());
+            response.setErrors(List.of(e.getMessage()));
+            return ResponseEntity.badRequest().body(response);
         }
 
         return ResponseEntity.ok().build();
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<Object> update(@RequestBody D dto, @PathVariable(name = "id") Long id){
+    public ResponseEntity<ApiResponse<D>> update(@RequestBody D dto, @PathVariable(name = "id") Long id){
+        ApiResponse<D> response = new ApiResponse<>();
         try {
             service.update(dto, id);
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            response.setErrors(List.of(e.getMessage()));
+            return ResponseEntity.badRequest().body(response);
         }
 
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<Object> findById(@PathVariable(name = "id") Long id){
+    public ResponseEntity<ApiResponse<D>> findById(@PathVariable(name = "id") Long id){
+        ApiResponse<D> response = new ApiResponse<>();
         D dto = service.findById(id);
         if (dto == null){
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(dto);
+        response.setData(dto);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping
-    public ResponseEntity<Object> getAll(){
-        return ResponseEntity.ok(service.findAll());
+    public ResponseEntity<ApiResponse<List<D>>> getAll(){
+        ApiResponse<List<D>> response = new ApiResponse<>();
+        response.setData(service.findAll());
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<Object> delete(@PathVariable(name = "id") Long id){
+    public ResponseEntity<ApiResponse<D>> delete(@PathVariable(name = "id") Long id){
         service.delete(id);
         return ResponseEntity.ok().build();
     }

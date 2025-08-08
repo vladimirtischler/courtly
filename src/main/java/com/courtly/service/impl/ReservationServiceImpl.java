@@ -37,8 +37,28 @@ public class ReservationServiceImpl extends AbstractService<Reservation, Reserva
 
     @Override
     public void save(ReservationDto dto) {
-        Objects.requireNonNull(dto);
         Reservation reservation = reservationMapper.toEntity(dto);
+        Court court = this.getCourt(dto);
+        if (court == null){
+            throw new IllegalArgumentException("Court not found");
+        }
+        reservation.setCourt(court);
+        Customer customer = customerService.findByPhoneNumber(reservation.getCustomer().getPhoneNumber());
+        if (customer == null){
+            customerDao.save(reservation.getCustomer());
+            customer = customerService.findByPhoneNumber(reservation.getCustomer().getPhoneNumber());
+        }
+        reservation.setCustomer(customer);
+        this.checkCollisionWithOtherReservations(reservation);
+        this.calculatePrice(reservation);
+
+        reservationDao.save(reservation);
+    }
+
+    @Override
+    public void update(ReservationDto dto, Long id) {
+        Reservation reservation = reservationDao.findById(id);
+        reservationMapper.update(reservation, dto);
         Court court = this.getCourt(dto);
         if (court == null){
             throw new IllegalArgumentException("Court not found");

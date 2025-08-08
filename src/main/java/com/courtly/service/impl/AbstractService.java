@@ -28,7 +28,9 @@ public abstract class AbstractService<E extends BaseEntity, D extends BaseDao<E>
     public void update(T dto, Long id) {
         E entity = dao.findById(id);
         if (entity == null){
-            return;
+            String nameOfEntity = dto.getClass().getSimpleName().replace("Dto", "");
+            throw new IllegalArgumentException(nameOfEntity+" with id "+id+" not " +
+                                                       "found");
         }
         mapper.update(entity, dto);
         dao.update(entity);
@@ -50,7 +52,7 @@ public abstract class AbstractService<E extends BaseEntity, D extends BaseDao<E>
     public void delete(Long id) {
         E entity = dao.findById(id);
         if (entity == null){
-            return;
+            throw new IllegalArgumentException("Entity with id "+id+" not found");
         }
         dao.delete(entity);
     }

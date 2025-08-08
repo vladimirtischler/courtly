@@ -29,6 +29,15 @@ public class SurfaceTypeServiceImpl extends AbstractService<SurfaceType, Surface
     }
 
     @Override
+    public void update(SurfaceTypeDto dto, Long id) {
+        SurfaceType surfaceType = surfaceTypeDao.findByName(dto.getName());
+        if (surfaceType != null && !surfaceType.getId().equals(id)){
+            throw new IllegalArgumentException("Surface with name " + dto.getName() + " already exists");
+        }
+        super.update(dto, id);
+    }
+
+    @Override
     public void validate(SurfaceType entity) {
 
     }
