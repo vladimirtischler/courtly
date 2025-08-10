@@ -63,7 +63,7 @@ public abstract class CommonController<E extends BaseEntity, D extends BaseDto, 
     @GetMapping
     public ResponseEntity<ApiResponse<List<D>>> getAll(){
         ApiResponse<List<D>> response = new ApiResponse<>();
-        response.setData(service.findAll());
+        response.setData(service.getAll());
         return ResponseEntity.ok(response);
     }
 

@@ -36,9 +36,4 @@ public class SurfaceTypeServiceImpl extends AbstractService<SurfaceType, Surface
         }
         super.update(dto, id);
     }
-
-    @Override
-    public void validate(SurfaceType entity) {
-
-    }
 }

@@ -43,7 +43,7 @@ public abstract class AbstractService<E extends BaseEntity, D extends BaseDao<E>
     }
 
     @Override
-    public List<T> findAll() {
+    public List<T> getAll() {
         List<E> entities = dao.findAll();
         return mapper.toDtos(entities);
     }

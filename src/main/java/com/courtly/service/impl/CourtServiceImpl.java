@@ -27,13 +27,15 @@ public class CourtServiceImpl extends AbstractService<Court, CourtDao, CourtDto,
     @Override
     public void save(CourtDto dto) {
         Court court = courtMapper.toEntity(dto);
-        SurfaceType surfaceType = null;
+        SurfaceType surfaceType;
         String surfaceName = dto.getSurfaceType().getName();
         Long surfaceId = dto.getSurfaceType().getId();
         if (surfaceId != null){
             surfaceType = surfaceTypeDao.findById(surfaceId);
         } else if (surfaceName != null){
             surfaceType = surfaceTypeDao.findByName(surfaceName);
+        } else {
+            throw new IllegalArgumentException("Surface type is not defined by name or id");
         }
 
         if (surfaceType == null) {
@@ -53,13 +55,15 @@ public class CourtServiceImpl extends AbstractService<Court, CourtDao, CourtDto,
                                                        "found");
         }
         courtMapper.update(court, dto);
-        SurfaceType surfaceType = null;
+        SurfaceType surfaceType;
         String surfaceName = dto.getSurfaceType().getName();
         Long surfaceId = dto.getSurfaceType().getId();
         if (surfaceId != null){
             surfaceType = surfaceTypeDao.findById(surfaceId);
         } else if (surfaceName != null){
             surfaceType = surfaceTypeDao.findByName(surfaceName);
+        } else {
+            throw new IllegalArgumentException("Surface type is not defined by name or id");
         }
 
         if (surfaceType == null) {
@@ -69,10 +73,5 @@ public class CourtServiceImpl extends AbstractService<Court, CourtDao, CourtDto,
 
         court.setSurfaceType(surfaceType);
         courtDao.update(court);
-    }
-
-    @Override
-    public void validate(Court entity) {
-
     }
 }

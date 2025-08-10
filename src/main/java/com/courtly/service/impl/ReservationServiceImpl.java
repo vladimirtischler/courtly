@@ -20,16 +20,13 @@ import java.util.Objects;
 @Service
 public class ReservationServiceImpl extends AbstractService<Reservation, ReservationDao, ReservationDto, ReservationMapper> implements ReservationService {
     private final CourtDao courtDao;
-    private final CustomerService customerService;
     private final ReservationDao reservationDao;
     private final ReservationMapper reservationMapper;
     private final CustomerDao customerDao;
 
-    public ReservationServiceImpl(ReservationDao dao, ReservationMapper reservationMapper, CourtDao courtDao,
-                                  CustomerService customerService, CustomerDao customerDao) {
+    public ReservationServiceImpl(ReservationDao dao, ReservationMapper reservationMapper, CourtDao courtDao, CustomerDao customerDao) {
         super(dao, reservationMapper);
         this.courtDao = courtDao;
-        this.customerService = customerService;
         this.reservationDao = dao;
         this.reservationMapper = reservationMapper;
         this.customerDao = customerDao;
@@ -38,19 +35,7 @@ public class ReservationServiceImpl extends AbstractService<Reservation, Reserva
     @Override
     public void save(ReservationDto dto) {
         Reservation reservation = reservationMapper.toEntity(dto);
-        Court court = this.getCourt(dto);
-        if (court == null){
-            throw new IllegalArgumentException("Court not found");
-        }
-        reservation.setCourt(court);
-        Customer customer = customerService.findByPhoneNumber(reservation.getCustomer().getPhoneNumber());
-        if (customer == null){
-            customerDao.save(reservation.getCustomer());
-            customer = customerService.findByPhoneNumber(reservation.getCustomer().getPhoneNumber());
-        }
-        reservation.setCustomer(customer);
-        this.checkCollisionWithOtherReservations(reservation);
-        this.calculatePrice(reservation);
+        this.processReservation(reservation);
 
         reservationDao.save(reservation);
     }
@@ -58,22 +43,13 @@ public class ReservationServiceImpl extends AbstractService<Reservation, Reserva
     @Override
     public void update(ReservationDto dto, Long id) {
         Reservation reservation = reservationDao.findById(id);
+        if (reservation == null){
+            throw new IllegalArgumentException("Reservation with id "+id+" not found");
+        }
         reservationMapper.update(reservation, dto);
-        Court court = this.getCourt(dto);
-        if (court == null){
-            throw new IllegalArgumentException("Court not found");
-        }
-        reservation.setCourt(court);
-        Customer customer = customerService.findByPhoneNumber(reservation.getCustomer().getPhoneNumber());
-        if (customer == null){
-            customerDao.save(reservation.getCustomer());
-            customer = customerService.findByPhoneNumber(reservation.getCustomer().getPhoneNumber());
-        }
-        reservation.setCustomer(customer);
-        this.checkCollisionWithOtherReservations(reservation);
-        this.calculatePrice(reservation);
+        this.processReservation(reservation);
 
-        reservationDao.save(reservation);
+        reservationDao.update(reservation);
     }
 
     @Override
@@ -91,12 +67,23 @@ public class ReservationServiceImpl extends AbstractService<Reservation, Reserva
         return reservationMapper.toDtos(reservations);
     }
 
-    @Override
-    public void validate(Reservation entity) {
-
+    private void processReservation(Reservation reservation){
+        Court court = this.getCourt(reservation);
+        if (court == null){
+            throw new IllegalArgumentException("Court not found");
+        }
+        reservation.setCourt(court);
+        Customer customer = customerDao.findByPhoneNumber(reservation.getCustomer().getPhoneNumber());
+        if (customer == null){
+            customerDao.save(reservation.getCustomer());
+            customer = customerDao.findByPhoneNumber(reservation.getCustomer().getPhoneNumber());
+        }
+        reservation.setCustomer(customer);
+        this.checkCollisionWithOtherReservations(reservation);
+        this.calculatePrice(reservation);
     }
 
-    private Court getCourt(ReservationDto reservation){
+    private Court getCourt(Reservation reservation){
         if (reservation.getCourt() == null || reservation.getCourt().getId() == null){
             return null;
         }
@@ -112,7 +99,7 @@ public class ReservationServiceImpl extends AbstractService<Reservation, Reserva
         }
 
         for (Reservation other : otherReservations){
-            if (ReservationUtils.isInCollision(reservation, other)){
+            if (ReservationUtils.isInCollision(reservation, other) && !other.getId().equals(reservation.getId())){
                 throw new IllegalArgumentException("Time of reservation is in collision with other");
             }
         }

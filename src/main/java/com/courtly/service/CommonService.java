@@ -9,7 +9,6 @@ public interface CommonService<D extends BaseDto, E extends BaseEntity> {
     void save(D dto);
     void update(D dto, Long id);
     D findById(Long id);
-    List<D> findAll();
+    List<D> getAll();
     void delete(Long id);
-    void validate(E entity);
 }
