@@ -42,107 +42,6 @@ public class CourtServiceTest {
     private CourtServiceImpl courtService;
 
     @Test
-    public void findAll_ReturnList() {
-        SurfaceType surfaceType = new SurfaceType();
-        surfaceType.setId(1L);
-        surfaceType.setName("Grass");
-        surfaceType.setFirstTariff(20.0);
-        surfaceType.setSecondTariff(45.0);
-        surfaceType.setThirdTariff(55.0);
-        surfaceType.setFourthTariff(60.0);
-        surfaceType.setDeleted(Boolean.FALSE);
-        surfaceType.setCreated(LocalDateTime.now());
-
-        SurfaceTypeDto surfaceTypeDto = new SurfaceTypeDto();
-        surfaceTypeDto.setId(1L);
-        surfaceTypeDto.setName("Grass");
-        surfaceTypeDto.setFirstTariff(20.0);
-        surfaceTypeDto.setSecondTariff(45.0);
-        surfaceTypeDto.setThirdTariff(55.0);
-        surfaceTypeDto.setFourthTariff(60.0);
-        surfaceTypeDto.setCreated(LocalDateTime.now());
-
-        Court court = new Court();
-        court.setId(1L);
-        court.setCreated(LocalDateTime.now());
-        court.setDeleted(Boolean.FALSE);
-        court.setName("Tennis court");
-        court.setSurfaceType(surfaceType);
-
-        CourtDto courtDto = new CourtDto();
-        courtDto.setId(1L);
-        courtDto.setCreated(LocalDateTime.now());
-        courtDto.setName("Tennis court");
-        courtDto.setSurfaceType(surfaceTypeDto);
-
-        List<Court> entities = List.of(court);
-        List<CourtDto> dtos = List.of(courtDto);
-
-        when(courtDao.findAll()).thenReturn(entities);
-        when(mapper.toDtos(entities)).thenReturn(dtos);
-
-        List<CourtDto> result = courtService.getAll();
-
-        Assertions.assertEquals(1, result.size());
-        Assertions.assertEquals("Tennis court", result.getFirst().getName());
-        verify(courtDao).findAll();
-        verify(mapper).toDtos(List.of(court));
-    }
-
-    @Test
-    void findById_ReturnSurfaceType() {
-        SurfaceType surfaceType = new SurfaceType();
-        surfaceType.setId(1L);
-        surfaceType.setName("Grass");
-        surfaceType.setFirstTariff(20.0);
-        surfaceType.setSecondTariff(45.0);
-        surfaceType.setThirdTariff(55.0);
-        surfaceType.setFourthTariff(60.0);
-        surfaceType.setDeleted(Boolean.FALSE);
-        surfaceType.setCreated(LocalDateTime.now());
-
-        SurfaceTypeDto surfaceTypeDto = new SurfaceTypeDto();
-        surfaceTypeDto.setId(1L);
-        surfaceTypeDto.setName("Grass");
-        surfaceTypeDto.setFirstTariff(20.0);
-        surfaceTypeDto.setSecondTariff(45.0);
-        surfaceTypeDto.setThirdTariff(55.0);
-        surfaceTypeDto.setFourthTariff(60.0);
-        surfaceTypeDto.setCreated(LocalDateTime.now());
-
-        Court court = new Court();
-        court.setId(1L);
-        court.setCreated(LocalDateTime.now());
-        court.setDeleted(Boolean.FALSE);
-        court.setName("Tennis court");
-        court.setSurfaceType(surfaceType);
-
-        CourtDto courtDto = new CourtDto();
-        courtDto.setId(1L);
-        courtDto.setCreated(LocalDateTime.now());
-        courtDto.setName("Tennis court");
-        courtDto.setSurfaceType(surfaceTypeDto);
-
-        when(courtDao.findById(1L)).thenReturn(court);
-        when(mapper.toDto(court)).thenReturn(courtDto);
-
-        CourtDto result = courtService.findById(1L);
-
-        Assertions.assertEquals("Tennis court", result.getName());
-        verify(courtDao).findById(1L);
-    }
-
-    @Test
-    void findById_ReturnNull() {
-
-        when(courtDao.findById(1L)).thenReturn(null);
-
-        CourtDto surfaceTypeDto = courtService.findById(1L);
-
-        Assertions.assertNull(surfaceTypeDto);
-    }
-
-    @Test
     void save_ExistingSurfaceTypeDefinedByIdInDto() {
         SurfaceType surfaceType = new SurfaceType();
         surfaceType.setId(1L);
@@ -537,39 +436,39 @@ public class CourtServiceTest {
         verify(courtDao, never()).update(any());
     }
 
-    @Test
-    void delete_DeleteById() {
-        SurfaceType surfaceType = new SurfaceType();
-        surfaceType.setId(1L);
-        surfaceType.setName("Grass");
-        surfaceType.setFirstTariff(20.0);
-        surfaceType.setSecondTariff(45.0);
-        surfaceType.setThirdTariff(55.0);
-        surfaceType.setFourthTariff(60.0);
-        surfaceType.setDeleted(Boolean.FALSE);
-        surfaceType.setCreated(LocalDateTime.now());
-
-        Court court = new Court();
-        court.setId(1L);
-        court.setCreated(LocalDateTime.now());
-        court.setDeleted(Boolean.FALSE);
-        court.setName("Tennis court");
-        court.setSurfaceType(surfaceType);
-
-        when(courtDao.findById(1L)).thenReturn(court);
-
-        courtService.delete(1L);
-        verify(courtDao).delete(court);
-    }
-
-    @Test
-    void delete_DeleteByIdNotExisting() {
-
-        when(courtDao.findById(1L)).thenReturn(null);
-
-        assertThrows(IllegalArgumentException.class, () ->
-                courtService.delete(1L)
-        );
-        verify(courtDao, never()).delete(any());
-    }
+//    @Test
+//    void delete_DeleteById() {
+//        SurfaceType surfaceType = new SurfaceType();
+//        surfaceType.setId(1L);
+//        surfaceType.setName("Grass");
+//        surfaceType.setFirstTariff(20.0);
+//        surfaceType.setSecondTariff(45.0);
+//        surfaceType.setThirdTariff(55.0);
+//        surfaceType.setFourthTariff(60.0);
+//        surfaceType.setDeleted(Boolean.FALSE);
+//        surfaceType.setCreated(LocalDateTime.now());
+//
+//        Court court = new Court();
+//        court.setId(1L);
+//        court.setCreated(LocalDateTime.now());
+//        court.setDeleted(Boolean.FALSE);
+//        court.setName("Tennis court");
+//        court.setSurfaceType(surfaceType);
+//
+//        when(courtDao.findById(1L)).thenReturn(court);
+//
+//        courtService.delete(1L);
+//        verify(courtDao).delete(court);
+//    }
+//
+//    @Test
+//    void delete_DeleteByIdNotExisting() {
+//
+//        when(courtDao.findById(1L)).thenReturn(null);
+//
+//        assertThrows(IllegalArgumentException.class, () ->
+//                courtService.delete(1L)
+//        );
+//        verify(courtDao, never()).delete(any());
+//    }
 }

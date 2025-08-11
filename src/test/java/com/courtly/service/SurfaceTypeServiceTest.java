@@ -38,23 +38,8 @@ public class SurfaceTypeServiceTest {
     @Test
     public void findAll_ReturnList() {
         SurfaceType surfaceType = new SurfaceType();
-        surfaceType.setId(1L);
-        surfaceType.setName("Grass");
-        surfaceType.setFirstTariff(20.0);
-        surfaceType.setSecondTariff(45.0);
-        surfaceType.setThirdTariff(55.0);
-        surfaceType.setFourthTariff(60.0);
-        surfaceType.setDeleted(Boolean.FALSE);
-        surfaceType.setCreated(LocalDateTime.now());
 
         SurfaceTypeDto surfaceTypeDto = new SurfaceTypeDto();
-        surfaceTypeDto.setId(1L);
-        surfaceTypeDto.setName("Grass");
-        surfaceTypeDto.setFirstTariff(20.0);
-        surfaceTypeDto.setSecondTariff(45.0);
-        surfaceTypeDto.setThirdTariff(55.0);
-        surfaceTypeDto.setFourthTariff(60.0);
-        surfaceTypeDto.setCreated(LocalDateTime.now());
 
         List<SurfaceType> entities = List.of(surfaceType);
         List<SurfaceTypeDto> dtos = List.of(surfaceTypeDto);
@@ -67,38 +52,26 @@ public class SurfaceTypeServiceTest {
         List<SurfaceTypeDto> result = surfaceTypeService.getAll();
 
         Assertions.assertEquals(1, result.size());
-        Assertions.assertEquals("Grass", result.getFirst().getName());
+        Assertions.assertEquals(surfaceTypeDto, result.getFirst());
         verify(surfaceTypeDao).findAll();
         verify(mapper).toDtos(List.of(surfaceType));
     }
 
     @Test
     void findById_ReturnSurfaceType() {
+        Long id = 1L;
         SurfaceType surfaceType = new SurfaceType();
-        surfaceType.setId(1L);
-        surfaceType.setName("Grass");
-        surfaceType.setFirstTariff(20.0);
-        surfaceType.setSecondTariff(45.0);
-        surfaceType.setThirdTariff(55.0);
-        surfaceType.setFourthTariff(60.0);
-        surfaceType.setDeleted(Boolean.FALSE);
-        surfaceType.setCreated(LocalDateTime.now());
+        surfaceType.setId(id);
 
         SurfaceTypeDto surfaceTypeDto = new SurfaceTypeDto();
-        surfaceTypeDto.setId(1L);
-        surfaceTypeDto.setName("Grass");
-        surfaceTypeDto.setFirstTariff(20.0);
-        surfaceTypeDto.setSecondTariff(45.0);
-        surfaceTypeDto.setThirdTariff(55.0);
-        surfaceTypeDto.setFourthTariff(60.0);
-        surfaceTypeDto.setCreated(LocalDateTime.now());
+        surfaceTypeDto.setId(id);
 
-        when(surfaceTypeDao.findById(1L)).thenReturn(surfaceType);
+        when(surfaceTypeDao.findById(id)).thenReturn(surfaceType);
         when(mapper.toDto(surfaceType)).thenReturn(surfaceTypeDto);
 
-        SurfaceTypeDto result = surfaceTypeService.findById(1L);
+        SurfaceTypeDto result = surfaceTypeService.findById(id);
 
-        Assertions.assertEquals("Grass", result.getName());
+        Assertions.assertEquals(surfaceTypeDto, result);
         verify(surfaceTypeDao).findById(1L);
     }
 
@@ -197,7 +170,6 @@ public class SurfaceTypeServiceTest {
 
         when(surfaceTypeDao.findByName(updated.getName())).thenReturn(surfaceType);
         when(surfaceTypeDao.findById(1L)).thenReturn(surfaceType);
-        doNothing().when(surfaceTypeDao).update(any(SurfaceType.class));
 
         doAnswer(invocation -> {
             SurfaceType entityArg = invocation.getArgument(0);

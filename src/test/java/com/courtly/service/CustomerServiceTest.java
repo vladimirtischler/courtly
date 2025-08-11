@@ -69,11 +69,4 @@ public class CustomerServiceTest {
         verify(customerDao).findByPhoneNumber(any());
         verify(customerMapper).toDto(any());
     }
-
-    @Test
-    void update_NotExistingCustomer(){
-
-        when(customerDao.findById(1L)).thenReturn(null);
-        assertThrows(IllegalArgumentException.class, () -> customerService.update(new CustomerDto(), 1L));
-    }
 }

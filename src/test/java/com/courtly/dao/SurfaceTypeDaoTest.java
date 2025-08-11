@@ -1,48 +1,108 @@
 package com.courtly.dao;
 
 import com.courtly.entity.SurfaceType;
-import org.junit.Test;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
+import jakarta.persistence.TypedQuery;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-@DataJpaTest
-@Import(SurfaceTypeDao.class)
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 public class SurfaceTypeDaoTest {
 
-    @Autowired
+    @Mock
+    private EntityManager entityManager;
+
+    @Mock
+    private TypedQuery<SurfaceType> typedQuery;
+
+    @InjectMocks
     private SurfaceTypeDao surfaceTypeDao;
 
-//    @Test
-//    public void findByName_ShouldReturnEntity_WhenExists() {
-//        SurfaceType surfaceType = new SurfaceType();
-//        surfaceType.setName("Grass");
-//        surfaceType.setFirstTariff(20.0);
-//        surfaceType.setSecondTariff(45.0);
-//        surfaceType.setThirdTariff(55.0);
-//        surfaceType.setFourthTariff(60.0);
-//        surfaceType.setDeleted(Boolean.FALSE);
-//        surfaceType.setCreated(LocalDateTime.now());
-//        surfaceTypeDao.save(surfaceType);
-//
-//        SurfaceType found = surfaceTypeDao.findByName("Grass");
-//
-//        assertNotNull(found);
-//        assertEquals("Grass", found.getName());
-//    }
-//
-//    @Test
-//    public void findByName_ShouldReturnNull_WhenNotExists() {
-//        SurfaceType found = surfaceTypeDao.findByName("Unknown");
-//        assertNull(found);
-//    }
+    @Test
+    void findByName_SurfaceTypeFound() {
+        SurfaceType expected = new SurfaceType();
+        expected.setName("Clay");
+
+        when(entityManager.createNamedQuery(SurfaceType.FIND_BY_NAME, SurfaceType.class))
+                .thenReturn(typedQuery);
+        when(typedQuery.setParameter("name", "Clay")).thenReturn(typedQuery);
+        when(typedQuery.getSingleResult()).thenReturn(expected);
+
+        SurfaceType result = surfaceTypeDao.findByName("Clay");
+
+        Assertions.assertEquals(result, expected);
+    }
+
+    @Test
+    void findByName_CatchNRE() {
+        when(entityManager.createNamedQuery(SurfaceType.FIND_BY_NAME, SurfaceType.class))
+                .thenReturn(typedQuery);
+        when(typedQuery.setParameter("name", "Unknown")).thenReturn(typedQuery);
+        when(typedQuery.getSingleResult()).thenThrow(new NoResultException());
+
+        SurfaceType result = surfaceTypeDao.findByName("Unknown");
+
+        Assertions.assertNull(result);
+    }
+
+    @Test
+    void save() {
+        SurfaceType entity = new SurfaceType();
+
+        surfaceTypeDao.save(entity);
+
+        verify(entityManager).persist(entity);
+    }
+
+    @Test
+    void update() {
+        SurfaceType entity = new SurfaceType();
+
+        surfaceTypeDao.update(entity);
+
+        verify(entityManager).merge(entity);
+    }
+
+    @Test
+    void findById() {
+        SurfaceType expected = new SurfaceType();
+        when(entityManager.find(SurfaceType.class, 1L)).thenReturn(expected);
+
+        SurfaceType result = surfaceTypeDao.findById(1L);
+
+        Assertions.assertEquals(expected, result);
+    }
+
+    @Test
+    void findAll() {
+        List<SurfaceType> expectedList = List.of(new SurfaceType(), new SurfaceType());
+        when(entityManager.createQuery("SELECT e FROM SurfaceType e WHERE e.deleted=FALSE", SurfaceType.class))
+                .thenReturn(typedQuery);
+        when(typedQuery.getResultList()).thenReturn(expectedList);
+
+        List<SurfaceType> result = surfaceTypeDao.findAll();
+
+        Assertions.assertEquals(expectedList, result);
+    }
+
+    @Test
+    void deleteShouldSetDeletedTrueAndMergeEntity() {
+        SurfaceType entity = new SurfaceType();
+        entity.setDeleted(false);
+
+        surfaceTypeDao.delete(entity);
+
+        Assertions.assertTrue(entity.getDeleted());
+        verify(entityManager).merge(entity);
+    }
 }
