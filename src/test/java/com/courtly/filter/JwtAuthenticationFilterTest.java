@@ -52,10 +52,22 @@ public class JwtAuthenticationFilterTest {
     }
 
     @Test
+    void doFilterInternal_authPathSkipsAuthCheck() throws Exception {
+        when(request.getServletPath()).thenReturn("/api/auth/login");
+
+        filter.doFilterInternal(request, response, filterChain);
+
+        verify(filterChain).doFilter(request, response);
+        verify(response, never()).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        Assertions.assertNull(SecurityContextHolder.getContext().getAuthentication());
+    }
+
+    @Test
     void doFilterInternal_validTokenSetsAuthentication() throws Exception {
         String token = "validToken";
         String username = "john";
 
+        when(request.getServletPath()).thenReturn("/api/secure");
         when(request.getHeader("Authorization")).thenReturn("Bearer " + token);
         when(jwtService.extractUsername(token)).thenReturn(username);
         when(userDetailsService.loadUserByUsername(username)).thenReturn(userDetails);
@@ -71,11 +83,9 @@ public class JwtAuthenticationFilterTest {
     }
 
     @Test
-    void doFilterInternal_invalidTokenSetsUnauthorized() throws Exception {
-        String token = "invalidToken";
-
-        when(request.getHeader("Authorization")).thenReturn("Bearer " + token);
-        when(jwtService.extractUsername(token)).thenThrow(new JwtException("Invalid"));
+    void doFilterInternal_missingAuthHeaderReturns401() throws Exception {
+        when(request.getServletPath()).thenReturn("/api/secure");
+        when(request.getHeader("Authorization")).thenReturn(null);
 
         filter.doFilterInternal(request, response, filterChain);
 
@@ -85,20 +95,38 @@ public class JwtAuthenticationFilterTest {
     }
 
     @Test
-    void doFilterInternal_NoHeaderCallsNextFilter() throws Exception {
-        when(request.getHeader("Authorization")).thenReturn(null);
+    void doFilterInternal_invalidAuthHeaderFormatReturns401() throws Exception {
+        when(request.getServletPath()).thenReturn("/api/secure");
+        when(request.getHeader("Authorization")).thenReturn("NotBearer token");
 
         filter.doFilterInternal(request, response, filterChain);
 
-        verify(filterChain).doFilter(request, response);
+        verify(response).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        verify(filterChain, never()).doFilter(request, response);
         Assertions.assertNull(SecurityContextHolder.getContext().getAuthentication());
     }
 
     @Test
-    void doFilterInternal_TokenNotValidatedDoesNotAuthenticate() throws Exception {
+    void doFilterInternal_invalidTokenReturns401() throws Exception {
+        String token = "invalidToken";
+
+        when(request.getServletPath()).thenReturn("/api/secure");
+        when(request.getHeader("Authorization")).thenReturn("Bearer " + token);
+        when(jwtService.extractUsername(token)).thenThrow(new JwtException("Invalid token"));
+
+        filter.doFilterInternal(request, response, filterChain);
+
+        verify(response).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        verify(filterChain, never()).doFilter(request, response);
+        Assertions.assertNull(SecurityContextHolder.getContext().getAuthentication());
+    }
+
+    @Test
+    void doFilterInternal_tokenNotValidatedDoesNotAuthenticate() throws Exception {
         String token = "validToken";
         String username = "john";
 
+        when(request.getServletPath()).thenReturn("/api/secure");
         when(request.getHeader("Authorization")).thenReturn("Bearer " + token);
         when(jwtService.extractUsername(token)).thenReturn(username);
         when(userDetailsService.loadUserByUsername(username)).thenReturn(userDetails);
@@ -109,4 +137,5 @@ public class JwtAuthenticationFilterTest {
         Assertions.assertNull(SecurityContextHolder.getContext().getAuthentication());
         verify(filterChain).doFilter(request, response);
     }
+
 }
