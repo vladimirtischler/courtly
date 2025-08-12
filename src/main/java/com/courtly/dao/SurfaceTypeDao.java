@@ -1,6 +1,5 @@
 package com.courtly.dao;
 
-import com.courtly.entity.Court;
 import com.courtly.entity.SurfaceType;
 import jakarta.persistence.NoResultException;
 import org.springframework.stereotype.Repository;
