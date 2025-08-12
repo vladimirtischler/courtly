@@ -21,7 +21,7 @@ import java.util.Base64;
 @RestController
 @RequestMapping("api/auth")
 @RequiredArgsConstructor
-public class LoginController {
+public class AuthController {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
@@ -46,8 +46,8 @@ public class LoginController {
         }
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<?> addNewUser(@RequestBody @Valid AuthRequest user) {
+    @PostMapping("register")
+    public ResponseEntity<?> register(@RequestBody @Valid AuthRequest user) {
         userService.save(user);
         return ResponseEntity.ok().build();
     }

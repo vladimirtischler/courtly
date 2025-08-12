@@ -69,4 +69,15 @@ public class CustomerServiceTest {
         verify(customerDao).findByPhoneNumber(any());
         verify(customerMapper).toDto(any());
     }
+
+    @Test
+    void update_NotFoundCustomer() {
+        Long id = 1L;
+        when(customerDao.findById(any(Long.class))).thenReturn(null);
+
+        assertThrows(IllegalArgumentException.class, () -> customerService.update(new CustomerDto(), id));
+
+        verify(customerMapper, never()).update(any(Customer.class), any(CustomerDto.class));
+        verify(customerDao, never()).update(any(Customer.class));
+    }
 }
