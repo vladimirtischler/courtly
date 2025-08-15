@@ -10,8 +10,9 @@ import java.util.List;
 
 public abstract class AbstractService<E extends BaseEntity, D extends BaseDao<E>,
         T extends BaseDto, M extends AbstractMapper<E, T>> implements CommonService<T, E> {
-    private D dao;
-    private M mapper;
+
+    protected D dao;
+    protected M mapper;
 
     public AbstractService(D dao, M mapper) {
         this.dao = dao;

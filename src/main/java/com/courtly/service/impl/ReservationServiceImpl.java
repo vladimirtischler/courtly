@@ -20,36 +20,32 @@ import java.util.Objects;
 @Service
 public class ReservationServiceImpl extends AbstractService<Reservation, ReservationDao, ReservationDto, ReservationMapper> implements ReservationService {
     private final CourtDao courtDao;
-    private final ReservationDao reservationDao;
-    private final ReservationMapper reservationMapper;
     private final CustomerDao customerDao;
 
     public ReservationServiceImpl(ReservationDao dao, ReservationMapper reservationMapper, CourtDao courtDao, CustomerDao customerDao) {
         super(dao, reservationMapper);
         this.courtDao = courtDao;
-        this.reservationDao = dao;
-        this.reservationMapper = reservationMapper;
         this.customerDao = customerDao;
     }
 
     @Override
     public void save(ReservationDto dto) {
-        Reservation reservation = reservationMapper.toEntity(dto);
+        Reservation reservation = super.mapper.toEntity(dto);
         this.processReservation(reservation);
 
-        reservationDao.save(reservation);
+        super.dao.save(reservation);
     }
 
     @Override
     public void update(ReservationDto dto, Long id) {
-        Reservation reservation = reservationDao.findById(id);
+        Reservation reservation = super.dao.findById(id);
         if (reservation == null){
             throw new IllegalArgumentException("Reservation with id "+id+" not found");
         }
-        reservationMapper.update(reservation, dto);
+        super.mapper.update(reservation, dto);
         this.processReservation(reservation);
 
-        reservationDao.update(reservation);
+        super.dao.update(reservation);
     }
 
     @Override
@@ -58,13 +54,13 @@ public class ReservationServiceImpl extends AbstractService<Reservation, Reserva
         if (court == null){
             throw new IllegalArgumentException("Court with id "+courtId+" not found");
         }
-        return reservationMapper.toDtos(reservationDao.findByCourtId(courtId, ascending));
+        return super.mapper.toDtos(super.dao.findByCourtId(courtId, ascending));
     }
 
     @Override
     public List<ReservationDto> findByPhoneNumber(String phoneNumber, Boolean inFuture) {
-        List<Reservation> reservations = reservationDao.findByPhoneNumber(phoneNumber, inFuture);
-        return reservationMapper.toDtos(reservations);
+        List<Reservation> reservations = super.dao.findByPhoneNumber(phoneNumber, inFuture);
+        return super.mapper.toDtos(reservations);
     }
 
     private void processReservation(Reservation reservation){
@@ -92,7 +88,7 @@ public class ReservationServiceImpl extends AbstractService<Reservation, Reserva
     }
 
     private void checkCollisionWithOtherReservations(Reservation reservation){
-        List<Reservation> otherReservations = reservationDao.findByCourtIdAndDate(reservation.getCourt().getId(),
+        List<Reservation> otherReservations = super.dao.findByCourtIdAndDate(reservation.getCourt().getId(),
                                                                                   reservation.getStartTime());
         if (CollectionUtils.isEmpty(otherReservations)){
             return;

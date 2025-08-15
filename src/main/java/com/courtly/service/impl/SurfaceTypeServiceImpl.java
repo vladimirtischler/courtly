@@ -12,16 +12,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class SurfaceTypeServiceImpl extends AbstractService<SurfaceType, SurfaceTypeDao, SurfaceTypeDto, SurfaceTypeMapper> implements SurfaceTypeService {
 
-    private final SurfaceTypeDao surfaceTypeDao;
-
     public SurfaceTypeServiceImpl(SurfaceTypeDao surfaceTypeDao, SurfaceTypeMapper surfaceTypeMapper) {
         super(surfaceTypeDao, surfaceTypeMapper);
-        this.surfaceTypeDao = surfaceTypeDao;
     }
 
     @Override
     public void save(SurfaceTypeDto dto) {
-        SurfaceType surfaceType = surfaceTypeDao.findByName(dto.getName());
+        SurfaceType surfaceType = super.dao.findByName(dto.getName());
         if (surfaceType != null){
             throw new IllegalArgumentException("Surface with name " + dto.getName() + " already exists");
         }
@@ -30,7 +27,7 @@ public class SurfaceTypeServiceImpl extends AbstractService<SurfaceType, Surface
 
     @Override
     public void update(SurfaceTypeDto dto, Long id) {
-        SurfaceType surfaceType = surfaceTypeDao.findByName(dto.getName());
+        SurfaceType surfaceType = super.dao.findByName(dto.getName());
         if (surfaceType != null && !surfaceType.getId().equals(id)){
             throw new IllegalArgumentException("Surface with name " + dto.getName() + " already exists");
         }

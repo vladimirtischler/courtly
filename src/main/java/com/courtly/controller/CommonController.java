@@ -17,7 +17,7 @@ import java.util.List;
 
 public abstract class CommonController<E extends BaseEntity, D extends BaseDto, S extends CommonService<D, E>> {
 
-    private S service;
+    protected S service;
 
     public CommonController(S service) {
         this.service = service;

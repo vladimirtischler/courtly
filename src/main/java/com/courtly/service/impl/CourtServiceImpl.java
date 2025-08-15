@@ -14,19 +14,15 @@ import org.springframework.stereotype.Service;
 public class CourtServiceImpl extends AbstractService<Court, CourtDao, CourtDto, CourtMapper> implements CourtService{
 
     private final SurfaceTypeDao surfaceTypeDao;
-    private final CourtMapper courtMapper;
-    private final CourtDao courtDao;
 
     public CourtServiceImpl(CourtDao courtDao, SurfaceTypeDao surfaceTypeDao, CourtMapper courtMapper) {
         super(courtDao, courtMapper);
         this.surfaceTypeDao = surfaceTypeDao;
-        this.courtMapper = courtMapper;
-        this.courtDao = courtDao;
     }
 
     @Override
     public void save(CourtDto dto) {
-        Court court = courtMapper.toEntity(dto);
+        Court court = super.mapper.toEntity(dto);
         SurfaceType surfaceType;
         String surfaceName = dto.getSurfaceType().getName();
         Long surfaceId = dto.getSurfaceType().getId();
@@ -44,17 +40,17 @@ public class CourtServiceImpl extends AbstractService<Court, CourtDao, CourtDto,
         }
 
         court.setSurfaceType(surfaceType);
-        courtDao.save(court);
+        super.dao.save(court);
     }
 
     @Override
     public void update(CourtDto dto, Long id) {
-        Court court = courtDao.findById(id);
+        Court court = super.dao.findById(id);
         if (court == null){
             throw new IllegalArgumentException("Court with id "+id+" not " +
                                                        "found");
         }
-        courtMapper.update(court, dto);
+        super.mapper.update(court, dto);
         SurfaceType surfaceType;
         String surfaceName = dto.getSurfaceType().getName();
         Long surfaceId = dto.getSurfaceType().getId();
@@ -72,6 +68,6 @@ public class CourtServiceImpl extends AbstractService<Court, CourtDao, CourtDto,
         }
 
         court.setSurfaceType(surfaceType);
-        courtDao.update(court);
+        super.dao.update(court);
     }
 }

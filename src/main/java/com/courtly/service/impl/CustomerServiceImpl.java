@@ -9,13 +9,9 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class CustomerServiceImpl extends AbstractService<Customer, CustomerDao, CustomerDto, CustomerMapper> implements CustomerService {
-    private final CustomerDao customerDao;
-    private final CustomerMapper customerMapper;
 
     public CustomerServiceImpl(CustomerDao dao, CustomerMapper customerMapper) {
         super(dao, customerMapper);
-        this.customerDao = dao;
-        this.customerMapper = customerMapper;
     }
 
     @Override
@@ -23,7 +19,7 @@ public class CustomerServiceImpl extends AbstractService<Customer, CustomerDao, 
         if (phoneNumber == null){
             return null;
         }
-        Customer customer = customerDao.findByPhoneNumber(phoneNumber);
-        return customerMapper.toDto(customer);
+        Customer customer = super.dao.findByPhoneNumber(phoneNumber);
+        return super.mapper.toDto(customer);
     }
 }
