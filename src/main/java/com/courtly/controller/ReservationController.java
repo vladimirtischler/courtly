@@ -17,11 +17,11 @@ import java.util.List;
 @RestController
 @RequestMapping("api/reservations")
 public class ReservationController extends CommonController<Reservation, ReservationDto, ReservationService>{
-    private final ReservationService reservationService;
+//    private final ReservationService reservationService;
 
     public ReservationController(ReservationService service) {
         super(service);
-        this.reservationService = service;
+//        this.reservationService = service;
     }
 
     @GetMapping("court/{courtId}")
@@ -30,7 +30,7 @@ public class ReservationController extends CommonController<Reservation, Reserva
 
         ApiResponse<List<ReservationDto>> response = new ApiResponse<>();
         try {
-            response.setData(reservationService.findByCourtId(courtId, !"DESC".equalsIgnoreCase(order)));
+            response.setData(super.service.findByCourtId(courtId, !"DESC".equalsIgnoreCase(order)));
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e){
             response.setErrors(List.of(e.getMessage()));
@@ -43,7 +43,7 @@ public class ReservationController extends CommonController<Reservation, Reserva
                                                       @RequestParam(name= "inFuture", required = false) Boolean inFuture) {
 
         ApiResponse<List<ReservationDto>> response = new ApiResponse<>();
-        response.setData(reservationService.findByPhoneNumber(phoneNumber, Boolean.TRUE.equals(inFuture)));
+        response.setData(super.service.findByPhoneNumber(phoneNumber, Boolean.TRUE.equals(inFuture)));
         return ResponseEntity.ok(response);
     }
 }
